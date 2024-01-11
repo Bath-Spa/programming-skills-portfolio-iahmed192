@@ -1,0 +1,98 @@
+class VendingMachine:
+    def __init__(self):
+        # Define items with codes, names, prices, and categories
+        self.items = {
+            "A1": {"name": "Soda", "price": 1.50, "category": "Beverage", "stock": 5},
+            "A2": {"name": "Chips", "price": 1.00, "category": "Snack", "stock": 3},
+            "A3": {"name": "Candy", "price": 0.75, "category": "Snack", "stock": 7},
+            "B1": {"name": "Coffee", "price": 2.00, "category": "Hot Beverage", "stock": 5},
+            "B2": {"name": "Chocolate", "price": 1.25, "category": "Sweet", "stock": 4}
+        }
+        self.balance = 0.0
+
+    def display_menu(self):
+        # Display the menu of items with categories
+        print("Welcome to the Vending Machine!")
+        print("Available items:")
+        categories = set(item["category"] for item in self.items.values())
+        for category in categories:
+            print(f"\n{category}:")
+            for code, item in self.items.items():
+                if item["category"] == category and item["stock"] > 0:
+                    print(f"{code}: {item['name']} - ${item['price']:.2f}")
+
+    def insert_money(self):
+        # Allow the user to insert money
+        while True:
+            try:
+                money = float(input("Insert money (in dollars): "))
+                if money >= 0:
+                    self.balance += money
+                    break
+                else:
+                    print("Please enter a positive amount.")
+            except ValueError:
+                print("Invalid input. Please enter a valid amount.")
+
+    def select_item(self):
+        # Allow the user to select an item based on code
+        while True:
+            code = input("Enter the code of the item you want to purchase: ")
+            if code in self.items:
+                item = self.items[code]
+                if item["stock"] > 0:
+                    item_price = item["price"]
+                    if item_price <= self.balance:
+                        # Dispense the item, update stock, and update the balance
+                        self.balance -= item_price
+                        item["stock"] -= 1
+                        print(f"Dispensing {item['name']}... Enjoy!")
+                        break
+                    else:
+                        print("Insufficient funds. Please insert more money.")
+                else:
+                    print("Sorry, this item is out of stock. Please choose another.")
+            else:
+                print("Invalid item code. Please enter a valid code.")
+
+    def return_change(self):
+        # Return any remaining balance as change
+        if self.balance > 0:
+            print(f"Returning change: ${self.balance:.2f}")
+            self.balance = 0
+        else:
+            print("No change to return.")
+
+    def buy_additional_item(self):
+        # Allow the user to buy additional items
+        while True:
+            choice = input("Do you want to buy additional items? (yes/no): ")
+            if choice.lower() == 'yes':
+                self.display_menu()
+                self.insert_money()
+                self.select_item()
+            else:
+                break
+
+    def suggest_purchase(self, selected_item_category):
+        # Suggest a purchase based on the selected item's category
+        suggested_items = [item for item in self.items.values() if item["category"] == selected_item_category and item["stock"] > 0]
+        if suggested_items:
+            print(f"\nYou might also like:")
+            for item in suggested_items:
+                print(f"{item['name']} - ${item['price']:.2f}")
+
+    def operate(self):
+        while True:
+            self.display_menu()
+            self.insert_money()
+            self.select_item()
+            self.return_change()
+            self.buy_additional_item()
+            selected_item_code = input("Enter the code of the last item you purchased: ")
+            selected_item_category = self.items[selected_item_code]["category"]
+            self.suggest_purchase(selected_item_category)
+
+# Instantiate the VendingMachine class and start the vending machine
+vending_machine = VendingMachine()
+vending_machine.operate()
